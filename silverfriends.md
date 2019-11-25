@@ -32,7 +32,7 @@ Raspberry pi와 카메라 모듈, openCV를 활용해 People Counter(계수기)�
 > **공간에 들어온 인원 수 - 공간을 나간 인원 수 = 현재 공간에 있는 인원 수**  
   
 ##### * 구성도
-![](./image/silverfriend_flow.png)
+![](./image/silverfriend_flow.jpeg)
 
 
 
