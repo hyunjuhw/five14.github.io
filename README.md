@@ -1,6 +1,23 @@
 ## SKT NUGU 서비스  
 
-[푹 잔 느낌](https://hyunjuhw.github.io/five14.github.io/honeysleep)  
+**[푹 잔 느낌](https://hyunjuhw.github.io/five14.github.io/honeysleep)**  
+충분히 잠을 잤음에도 불구하고 아침에 일어나는 게 왜 이렇게 힘들까요?  
+Play ‘잘 잔 느낌’은 여기에서 출발합니다.  
+‘잘 잔 느낌’은 사용자가 NUGU에게 다음날 아침 기상 시간을 말하면 가장 개운하게 일어나기 위한 ‘잠들어야 하는 시간들’ 을 알려줍니다.  
+  
+- 간편 예시)  
+사용자:  “아리아, 아침 6시30분에 일어나려면 몇 시에 자야 돼?”  
+NUGU:  “오후 11시, 혹은, 오전 12시 30분에 주무시면 다음날 개운하게 일어나실 수 있어요~”  
 
-[경로당 친구들](https://hyunjuhw.github.io/five14.github.io/silverfriends)  
+
+**[경로당 친구들](https://hyunjuhw.github.io/five14.github.io/silverfriends)**  
+경로당에 가기 전에 미리 경로당에 몇 명이 있는지 알 수 없을까?  
+[노인을 위한 실시간 경로당 인원 알리미 서비스.]  
+  
+- 간편 예시) 
+사용자:  “아리아, 경로당에 몇 명 있어?”  
+NUGU:  “현재 행당동 경로당에는 총 5분이 계시네요. 방문하셔도 좋을 것 같습니다~”  
+
+
+
 
