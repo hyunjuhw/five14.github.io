@@ -38,9 +38,86 @@ Play ‘푹 잔 느낌’은 잠에 드는 시간이 불규칙하여 기상 시 
   ㅤ
   ㅤ
   ㅤ
-### 기술 설명
+### 구성도
 -----------------------------------------------
-
+코드를 살펴보기에 앞서, 아래 이미지를 통해 '푹 잔 느낌'의 구성도를 살펴볼까요?  
+  
+이 구성도는 첫 실행 발화(예를 들어, '아리아, 푹 잔 느낌 실행해줘')를 통해 서비스가 시작된 후를 나타냅니다. 사용자는 자신이 일어나고 싶은 시간 '오전 6시 30분'을 NUGU에게 전달하면, NUGU는 '푹 잔 느낌'의 프록시 서버와 통신하여 사용자가 잠들어야 할 시간 목록을 받아옵니다. 시간 목록은 발화가 시작된 시간(앞으로 '현재 시간'이라고 사용)과 수면 시간을 모두 고려하여 계산됩니다.
+  
 ![](./image/serviceflow.jpeg)
 
+  
+### 코드 설명
+-----------------------------------------------
+  
+~~~python
+# time_term 만큼 시간을 빼고 한글로 오전 혹은 오후를 붙여서 만들어주는 함수.
+def time_calc(input_time, time_term):
+    # 입력된 시간에서 time_term만큼 빼준다.
+    sleep_time = input_time - timedelta(minutes=time_term)
+    sleep_hour = sleep_time.hour
+    # 12시가 넘으면 오후이므로 오후를 붙여주고 아니면 오전을 붙여준다
+    ampm = "오후" if sleep_time.hour > 12 else "오전"
+    # 계산된 시간이 오후일때는 12를 빼준다.
+    if sleep_time.hour > 12:
+        sleep_hour = sleep_time.hour - 12
+    # 오전 00시 일 때 오전 12시로 바꿔줌
+    if sleep_hour == 0:
+        sleep_hour = 12
 
+    result = "{} {}시".format(ampm, sleep_hour)
+    # minute이 0일때는 안붙여줘도 되므로 0이 아닌 경우에만 xx분이라고 붙여준다.
+    if sleep_time.minute != 0:
+        result += " {}분".format(sleep_time.minute)
+
+    return result
+
+
+@application.route("/later", methods=['POST'])
+@application.route("/answer.go_to_bed_time", methods=['POST', 'GET'])
+def wakeup_time():
+    # 파라미터 처리
+    data = request.get_json(silent=True, force=True)
+    data = data["action"].get('parameters')
+    wakeup_time_duration = data.get('wakeup_time_duration')
+    wakeup_time_duration = wakeup_time_duration.get('value')
+    data['wakeup_time_duration'] = wakeup_time_duration
+    hour = data.get('wakeup_time_hour')
+    hour = hour.get('value')
+    data['wakeup_time_hour'] = hour
+    min = data.get('wakeup_time_min', 0)
+    if min != 0:
+        min = min.get('value')
+        data['wakeup_time_min'] = min
+    later = data.get('later')
+
+    output_times = data
+
+    if not hour:
+        return make_response({"resultCode": "exception_1",
+                              "output": 'exception_1'})
+    hour = int(hour)
+    min = int(min)
+    if hour > 12:
+        hour = hour - 12
+
+    if wakeup_time_duration == '오후':
+        hour = hour + 12
+
+    current_time = time(hour=hour, minute=min)
+    input_time = datetime.combine(date.today(), current_time)
+
+    # later 없을 때와 있을때 파라미터 다르게 들어가기
+    output_times['best_sleep_time1'] = time_calc(input_time, 375)
+    output_times['best_sleep_time2'] = time_calc(input_time, 465)
+    if later:
+        output_times['best_sleep_time3'] = time_calc(input_time, 285)
+        output_times['best_sleep_time4'] = time_calc(input_time, 555)
+    # output 형태느 다음과 같다.
+    output = {
+                "resultCode": "OK",
+                "output": output_times
+            }
+
+    return make_response(output)
+~~~
