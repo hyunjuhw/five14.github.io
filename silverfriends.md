@@ -32,8 +32,13 @@
 
 > **공간에 들어온 인원 수 - 공간을 나간 인원 수 = 현재 공간에 있는 인원 수**  
 
-##### * 구성도
+##### * 시스템 구성도
 ![](./image/silverfriend_flow.jpeg)
+
+##### * 서비스 구성도
+![](./image/silverfriend/service_flow.jpeg)
+
+
 
 
 
