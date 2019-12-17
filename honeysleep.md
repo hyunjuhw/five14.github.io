@@ -386,6 +386,11 @@ if __name__ == '__main__':
 &nbsp;
 <br>
   
-#### 3. 아침에 일어난 직후는 왜 이렇게 피곤할까?[(https://www.youtube.com/watch?v=tn89hk2j2-o)](https://www.youtube.com/watch?v=tn89hk2j2-o)  
+#### 3. 아침에 일어난 직후는 왜 이렇게 피곤할까?[(https://www.youtube.com/watch?v=tn89hk2j2-o)](https://www.youtube.com/watch?v=tn89hk2j2-o) 
   
-[![Video Label](http://img.youtube.com/vi//vi/tn89hk2j2-o/0.jpg)](https://www.youtube.com/watch?v=tn89hk2j2-o)
+잠을 많이 잔 것 같음에도 불구하고 아침에 일어나는 게 왜 힘든지에 관해 쉽게 설명해주는 영상입니다. 2019년 12월 17일 기준 조회수 2,319,947회에 육박하며 많은 사람들이 이 영상의 제목에 공감하고 있음을 알 수 있습니다. 
+  
+[![Youtube Video](http://img.youtube.com/vi/tn89hk2j2-o/0.jpg)](https://www.youtube.com/watch?v=tn89hk2j2-o)  
+<br>
+&nbsp;
+<br>
