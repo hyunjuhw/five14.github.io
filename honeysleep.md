@@ -339,7 +339,7 @@ if __name__ == '__main__':
 
 ### 관련 자료
 --------------------------
-#### [취침 및 기상 시간 계산 사이트(https://sleepyti.me/)](https://sleepyti.me/)
+#### 1. 취침 및 기상 시간 계산 사이트[(https://sleepyti.me/)](https://sleepyti.me/)
 <br>
 <img src="./image/honeysleep/sleepy_main.png" width="650px" />  
 <br>
@@ -348,15 +348,27 @@ if __name__ == '__main__':
 아래와 같이, 총 4개의 시간을 알려주는데요. 일어나야 하는 시간 9시간 전, 7시간 30분 전, 6시간 전 그리고 4시간 30분 전의 시간을 알려줍니다. 
 이 시간들은 잠에 드는데 소요되는 시간을 포함하고 있지 않기 때문에, 만약 자신이 잠에 드는데 대략 15분이 걸린다면 계산된 시간에서 15분 전에 잠에 들어야 합니다. 
 <br>
+&nbsp;
+<br>
 <img src="./image/honeysleep/sleepy_result_1.png" width="650px" />
+<br>
+&nbsp;
 <br>
 두번째 기능은 기상시간 입니다. 바로 지금 잠에 들었을 때, 언제 일어나야 개운하게 일어날 수 있는지 알려줍니다.  
 이 기능에서는 잠에 드는 시간이 대략 15분이라는 것을 포함하여 여러 기상시간을 알려주고 가장 개운하게 일어날 수 있는 것은 5 ~ 6 사이클의 수면을 도는 것이라고 말해줍니다.
 <br>
+&nbsp;
+<br>
 <img src="./image/honeysleep/sleepy_result_2.png" width="650px" />
 <br>
-비즈니스용 웹 분석 서비스를 제공하는 [SimilarWeb](https://www.similarweb.com/) 를 통해 알아낸 Sleepyti.me 사이트의 트랙픽은 다음과 같습니다. 
+&nbsp;
+<br>
+비즈니스용 웹 분석 서비스를 제공하는 SimilarWeb [(https://www.similarweb.com/)](https://www.similarweb.com/) 를 통해 알아낸 Sleepyti.me 사이트의 트랙픽은 다음과 같습니다. <br>
 2019년 10월 기준, 월간 총 방문자 수는 약 228만명 정도이며 지난 6개월간의 그래프를 보면 약 150만명정도의 안정적인 사용자층을 확보한 서비스라는 것을 알 수 있습니다. 또한, 주목할만한 점은 오른쪽 리스트입니다. 각 국가마다 Sleepyti.me를 얼마나 사용하는지 볼 수 있는데 그 중 한국 사용자의 비율이 가장 높다는 것을 볼 수 있습니다. 이를 통해, 현재 많은 사람들이 취침 및 수면시간에 관심이 높다는 것을 알 수 있습니다.
 <br>
+&nbsp;
+<br>
 <img src="./image/honeysleep/sleepy_traffic.png" width="650px" />
+<br>
+&nbsp;
 <br>
