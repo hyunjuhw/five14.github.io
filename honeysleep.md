@@ -388,4 +388,4 @@ if __name__ == '__main__':
   
 #### 3. 아침에 일어난 직후는 왜 이렇게 피곤할까?[(https://www.youtube.com/watch?v=tn89hk2j2-o)](https://www.youtube.com/watch?v=tn89hk2j2-o)  
   
-[![Video Label](http://img.youtube.com/vi//vi/tn89hk2j2-o/0.jpg)](https://youtu.be//vi/tn89hk2j2-o?t=0s)
+[![Video Label](http://img.youtube.com/vi//vi/tn89hk2j2-o/0.jpg)](https://www.youtube.com/watch?v=tn89hk2j2-o)
