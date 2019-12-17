@@ -388,7 +388,7 @@ def later_time_two():
   
 #### 2. 『Physiology, Sleep Stages Aakash K. Patel; John F. Araujo.』[(https://www.ncbi.nlm.nih.gov/pubmed/30252388)](https://www.ncbi.nlm.nih.gov/pubmed/30252388)  
   
-수면 패턴 및 관련된 질병에 관한 연구자료입니다. 수면 패턴이 몇 단계로 구성되어 있는지, 각 단계가 구체적으로 어떤 단계인지 그리고 수면과 관련된 질병에 관한 내용을 다루고 있습니다.  
+수면 패턴 및 수면과 관련된 질병에 관한 연구자료입니다. 수면 패턴이 몇 단계로 구성되어 있는지, 각 단계가 구체적으로 어떤 단계인지 그리고 수면과 관련된 질병에 관한 내용을 다루고 있습니다.  
 <br>
 &nbsp;
 <br>
