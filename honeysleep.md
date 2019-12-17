@@ -32,7 +32,7 @@
 * 수면의 4단계: 숙면의 단계, 잠을 깨기 어렵고 온 몸이 쉬는 단계.  
 * REM수면 단계: 최고 숙면의 단계, 온몸의 근육이 풀어지고 긴장도가 최소화.
   
-![](https://inmun360.culture.go.kr/upload/board/image/95/2358895_201810251428505600.jpg)
+<img src="https://inmun360.culture.go.kr/upload/board/image/95/2358895_201810251428505600.jpg" width="100%" />
   
 이렇듯 수면에는 여러 단계가 있기 때문에 우리가 어떤 단계일 때 일어나냐에 따라 기상 시의 기분이 달라집니다.
 수면의 3, 4단계나 REM수면 단계일 때 기상 알람이 울려 잠에서 깨면, 숙면 중에 억지로 깬 것이라 극심한 피로감을 느낄 수 밖에 없습니다.
@@ -60,7 +60,7 @@
 
 예를 들어 사용자가 자신이 일어나고 싶은 ‘오전 6시 30분’을 NUGU에게 전달하면, NUGU는 ‘푹 잔 느낌’의 프록시 서버와 통신하여 사용자가 잠들어야 할 시각(앞으로 ‘취침 시각’이라고 지칭) 목록을 받아옵니다. 취침 시각은 발화가 시작된 시각(앞으로 ‘현재 시각’이라고 지칭)과 수면 시간을 모두 고려하여 계산합니다.
   
-![](./image/serviceflow.jpeg)
+<img src="./image/serviceflow.jpeg" width="100%" />
   
 구성도가 이해되셨나요? 이어서 예상 발화를 통해 ‘푹 잔 느낌’이 제공하는 서비스를 좀 더 깊게 살펴보겠습니다.  
 
@@ -346,7 +346,7 @@ if __name__ == '__main__':
 --------------------------
 #### 1. 취침 및 기상 시간 계산 사이트[(https://sleepyti.me/)](https://sleepyti.me/)
 <br>
-<img src="./image/honeysleep/sleepy_main.png" width="650px" />  
+<img src="./image/honeysleep/sleepy_main.png" width="100%" />  
 <br>
 이 사이트는 사용자에게 수면에 관한 두가지 기능을 제공합니다.  
 <br> &nbsp; <br>
@@ -356,7 +356,7 @@ if __name__ == '__main__':
 <br>
 &nbsp;
 <br>
-<img src="./image/honeysleep/sleepy_result_1.png" width="650px" />
+<img src="./image/honeysleep/sleepy_result_1.png" width="100%" />
 <br>
 &nbsp;
 <br>
@@ -365,7 +365,7 @@ if __name__ == '__main__':
 <br>
 &nbsp;
 <br>
-<img src="./image/honeysleep/sleepy_result_2.png" width="650px" />
+<img src="./image/honeysleep/sleepy_result_2.png" width="100%" />
 <br>
 &nbsp;
 <br>
@@ -374,7 +374,7 @@ if __name__ == '__main__':
 <br>
 &nbsp;
 <br>
-<img src="./image/honeysleep/sleepy_traffic.png" width="650px" />
+<img src="./image/honeysleep/sleepy_traffic.png" width="100%" />
 <br>
 &nbsp;
 <br>
