@@ -70,21 +70,36 @@
   |----------|----------------|  
   | 사용자 | 아리아, 푹 잔 느낌 실행해줘 |  
   | NUGU | 안녕하세요, 푹 잔 느낌입니다. 몇 시에 일어나실 예정이세요? '오전 7시' 혹은 '오후 8시 30분' 처럼 말씀해 주세요. |  
-  | 사용자 | 오전 8시 30분에 일어날거야. |  
-  | NUGU | 오전 12시 45분이나 오전 2시 15분에 주무시면 개운하게 일어나실 수 있어요. 더 늦게 주무실 예정인가요? |  
+  | 사용자 | (현재 시각이 오전 12시)오전 8시 30분에 일어날거야. |  
+  | NUGU | 오전 12시 45분에, 주무시면 됩니다. 45분 남았습니다. 더 늦게 주무실 예정인가요? |  
   | 사용자 | 아니, 괜찮아 |  
   | NUGU | 푹 잔 느낌 서비스를 종료합니다. 안녕히 주무세요~ |  
 
 가장 기본이 되는 발화 흐름입니다. ‘푹 잔 느낌’ 서비스는 사용자로부터 입력받은 기상 시각 ‘오전 8시 30분’에 대해 3개의 취침 시각을 계산합니다. 수면 사이클이 90분간 지속되므로, ’7시간 30분’, ‘6시간’ 그리고 ‘4시간 30분’이 수면의 1,2단계에 기상하기 위해 적절한 수면 시간입니다. 여기에 잠에 드는 시간인 약 15분 정도를 고려하여 취침 시각 목록은 ‘오전 12시 45분’, ‘오전 2시 15분’과 ‘오전 3시 45분’이 됩니다.
 
-이 중에서 현재 시각을 고려해 두개의 값을 골라 사용자에게 전달합니다. 사용자에게 알려준 취침 시각이 이미 지나갔다면 의미가 없을테니까요. 혹시 더 늦게 취침하고 싶은 사용자를 위해 ‘더 늦게 주무실 예정인가요?’ 와 같은 추가질문도 제공합니다.
-
-만약 시각이 너무 늦어 사용자에게 알려줄 수 있는 시각이 하나 뿐일 경우에는 어떻게 될까요?  
+이 중에서 현재 시각과 가장 가까운 첫번째 시간과 그 시간까지 남은 시간을 알려줍니다. 혹시 더 늦게 취침하고 싶은 사용자를 위해 ‘더 늦게 주무실 예정인가요?’ 와 같은 추가질문도 제공합니다. 만일 더 늦게 자고 싶은 분들을 위해 아래에 또 다른 시나리오가 있습니다.
 <br>
 &nbsp;
 <br>
   
-#### 시나리오 2(알려줄 수 있는 시각이 1개인 경우)
+#### 시나리오 2(다른 시간이 궁금한 경우)
+  
+  | | |  
+  |----------|----------------|  
+  | 사용자 | 아리아, 푹 잔 느낌 실행해줘 |  
+  | NUGU | 안녕하세요, 푹 잔 느낌입니다. 몇 시에 일어나실 예정이세요? '오전 7시' 혹은 '오후 8시 30분' 처럼 말씀해 주세요. |  
+  | 사용자 | (현재 시각이 오전 12시)오전 8시 30분에 일어날거야. |  
+  | NUGU | 오전 12시 45분에, 주무시면 됩니다. 45분 남았습니다. 더 늦게 주무실 예정인가요? |  
+  | 사용자 | 응! |  
+  | NUGU | 오전 2시 15분 혹은, 오전 3시 45분에 주무시면 됩니다. 안녕히 주무세요~ |  
+
+
+현재 시나리오 2는 사용자에게 알려줄 수 있는 시간이 2개 이상일 경우 가능합니다. 만약 시각이 늦어 사용자에게 알려줄 수 있는 시간이 하나 뿐일 경우에는 어떻게 될까요?  
+<br>
+&nbsp;
+<br>
+  
+#### 시나리오 3(알려줄 수 있는 시각이 1개인 경우)
   
   | | |  
   |----------|----------------|  
@@ -99,7 +114,7 @@
 &nbsp;
 <br>
   
-#### 시나리오 3(알려줄 수 있는 시각이 없는 경우)
+#### 시나리오 4(알려줄 수 있는 시각이 없는 경우)
   
   | | |  
   |----------|----------------|  
@@ -212,13 +227,13 @@ def go_to_bed_time():
 &nbsp;
 <br>  
   
-#### <u>다음 4 ~ 6은 RESTful를 통해 Play builder에서 미리 정의한 Backend 파라미터로 값을 전달해주는 response 함수입니다.<u/>  
+#### <u>* 다음 4 ~ 6은 RESTful API를 통해 Play builder에서 미리 정의한 Backend 파라미터로 값을 전달해주는 response 함수입니다.<u/>  
 <br>
 &nbsp;
 <br>  
   
 #### 4. time_one 함수  
-사용자가 '푹 잔 느낌' 서비스를 호출 시점이 계산된 time_one, time_two, time_three 보다 이전일 때, 3가지의 시간이 모두 유효합니다. 따라서, 3가지 시간을 모두 알려줍니다.  
+사용자의 '푹 잔 느낌' 서비스 호출 시점이 time_one, time_two, time_three 보다 이전일 때, 실행되는 함수입니다. 호출 시점과 가장 가까운 취침시간과 그 시간까지 남은 시간을 리턴합니다.
 
 ~~~python
 def time_one():
@@ -226,7 +241,7 @@ def time_one():
 
     output_times = dict()
 
-    # 위의 go_to_bed_time에서 계산된 결과값을 리턴합니다.
+    # 위의 go_to_bed_time에서 계산된 'best_sleep_time1'과 'remain_time' 결과값을 리턴합니다.
     output_times['best_sleep_time1'] = data['best_sleep_time1'].get('value')
     output_times['remaine_time'] = data['remain_time'].get('value')
 
@@ -242,13 +257,14 @@ def time_one():
 <br>  
   
 #### 5. time_two 함수  
-Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_one을 지나고 time_two보다는 이전인 상태. time_two, time_three 총 2가지의 시간이 유효하다.
+사용자의 '푹 잔 느낌' 서비스 호출 시간이 time_one을 지나고 time_two보다는 이전일 때 실행되는 함수입니다. 따라서 계산된 'best_sleep_time2', 즉 time_two와 그 시간까지 남은 시간을 반환합니다.
 ~~~python
 def time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-
+    
+    # 위의 go_to_bed_time에서 계산된 'best_sleep_time2'과 'remain_time' 결과값을 리턴합니다.
     output_times['best_sleep_time2'] = data['best_sleep_time2'].get('value')
     output_times['remain_time'] = data['remain_time'].get('value')
 
@@ -264,13 +280,15 @@ def time_two():
 <br>  
   
 #### 6. time_three 함수  
-Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_two를 지나고 time_three 이전인 상태. time_three 단 한가지의 시간만이 유효하다.
+사용자의 '푹 잔 느낌' 서비스 호출 시간이 time_two을 지나고 time_three보다는 이전일 때 실행되는 함수입니다. 따라서 계산된 'best_sleep_time3', 즉 time_three와 그 시간까지 남은 시간을 반환합니다. 호출 시간이 time_three까지 지난 경우를 처리하는 함수도 따로 있지만, 간단하기 때문에 따로 적지 않았습니다.
+
 ~~~python
 def time_three():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
 
+    # 위의 go_to_bed_time에서 계산된 'best_sleep_time3'과 'remain_time' 결과값을 리턴합니다.
     output_times['best_sleep_time3'] = data['best_sleep_time3'].get('value')
     output_times['remain_time'] = data['remain_time'].get('value')
 
@@ -285,13 +303,15 @@ def time_three():
 &nbsp;
 <br>  
   
-#### 7. later_time_one 함수
+#### 7. later_time_one 함수  
+사용자가 time_one의 결과값을 받고 나서, 다른 취침시간을 더 알고 싶은 경우(시나리오 2에서 '더 늦게 주무실 예정인가요?' 라는 NUGU의 물음에 긍정적인 대답이 돌아온 상황)에 호출되는 함수입니다. go_to_bed_time 함수에서 계산된 나머지 결과값인 time_two와 time_three를 반환한다고 생각하시면 됩니다. 
 ~~~python
 def later_time_one():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-
+    
+    # 위의 go_to_bed_time에서 계산된 'best_sleep_time3'과 'best_sleep_time3' 결과값을 리턴합니다.
     output_times['best_sleep_time2'] = data['best_sleep_time2'].get('value')
     output_times['best_sleep_time3'] = data['best_sleep_time3'].get('value')
 
@@ -307,14 +327,15 @@ def later_time_one():
 <br>  
   
 #### 8. later_time_two 함수  
-더 늦게 주무실 예정이세요? 를 처리하는 함수.
+사용자가 time_two의 결과값을 받고 나서, 다른 취침시간을 더 알고 싶은 경우에 호출되는 함수입니다. 이 경우에는, 남은 결과값이 time_three뿐이기 때문에 이 값만 반환한다고 생각하시면 됩니다. 
 ~~~python
 def later_time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
     print(data)
-
+    
+    # 위의 go_to_bed_time에서 계산된 'best_sleep_time3' 결과값을 리턴합니다.
     output_times['best_sleep_time3'] = data['best_sleep_time3'].get('value')
 
     output = {
