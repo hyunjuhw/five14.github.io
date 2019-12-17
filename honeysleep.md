@@ -115,6 +115,7 @@
 ### 코드 설명
 -----------------------------------------------
   
+#### 1. 필요한 모듈  
 ~~~python
 import pytz
 import datetime
@@ -122,17 +123,24 @@ from flask import Flask, make_response
 from flask_cors import CORS
 from helper import request
 import json
+~~~  
+##### * pytz
+Olson 시간대 데이터베이스를 기준으로 한 세계 시간대 정의를 위한 라이브러리. 'Asia/Seoul' 한국 시간대를 가져오기 위해서 사용하였다.  
+##### * datetime
+시간 처리를 위한 라이브러리. 위의 pytz를 통해 한국 시간대를 가져와 datetime 객체 내부의 timezone 속성을 바꿔준다. 
 
-application = Flask(__name__)
-CORS(application, max_age=31536000, supports_credentials=True)
 
+
+#### 2. time_calculate 함수  
+go_to_bed_time 함수에서 내부 호출되는 함수입니다. 기상시간의 'hour'와 'min' 값을 전달받아 사용자에게 알려줄 시간 리스트(time_one, time_two, time_three)를 계산합니다. 서버의 시간의 UST로 설정이 되어있기 때문에, 시간 리스트 처리전에 pytz 라이브러리를 사용하여 한국 시간대로 변경해 줍니다.  
+  
+~~~python
 def time_calculate(hour, min):
 
-    # input_time = datetime.datetime.combine(datetime.date.today(), datetime.time(hour=hour, minute=min))
     input_time = datetime.datetime.now().astimezone(pytz.timezone('Asia/Seoul')).replace(hour=hour,minute=min,second=0,microsecond=0)
     kst_now = datetime.datetime.now().astimezone(pytz.timezone('Asia/Seoul'))
-    # input_time = input_time.replace(tzinfo=datetime.timezone(datetime.timedelta(hours=9)))
-
+   
+    # 예를 들어, 현재 시간이 오후 10시이면서, 입력 값이 오후 9시인 경우 다음날 오후 9시로 처리할 수 있도록 처리.
     if input_time.hour < kst_now.hour:
         input_time = input_time.replace(day=input_time.day+1)
     elif input_time.hour == kst_now.hour:
@@ -144,8 +152,10 @@ def time_calculate(hour, min):
     time_three = input_time - datetime.timedelta(minutes=285)
 
     return kst_now, time_one, time_two, time_three
+~~~
 
-
+#### 3. time_transform 함수
+~~~python
 def time_transform(input_time):
 
     try:
@@ -175,38 +185,33 @@ def time_transform(input_time):
             result = f"{sleep_min}분"
 
         return result
+~~~
 
-
-@application.route("/answer.go_to_bed_time", methods=['POST', 'GET'])
-
-def go_to_bet_time():
+#### 3. go_to_bed_time 함수  
+사용자의 기상 시간(예를 들어, 오전 7시 30분)을 전달 받아 가장 먼저 시작되는 함수입니다. 입력된 시간을 
+~~~python
+def go_to_bed_time():
 
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
-    wakeup_time_duration = data.get('wakeup_time_duration').get('value')
-    wakeup_time_hour = data.get('wakeup_time_hour').get('value')
-    wakeup_time_min = data.get('wakeup_time_min',dict()).get('value', '0')
+    wakeup_time_duration = data.get('wakeup_time_duration').get('value') # 오전/오후 구분 => '오전'
+    wakeup_time_hour = data.get('wakeup_time_hour').get('value') # 기상 시간의 '시간' => '8시'
+    wakeup_time_min = data.get('wakeup_time_min',dict()).get('value', '0') # 기상 시간의 '분' => '30분'
 
     wakeup_time_hour = int(wakeup_time_hour)
     wakeup_time_min = int(wakeup_time_min)
 
     if wakeup_time_duration == "오전":
-        if wakeup_time_hour > 12:
+        if wakeup_time_hour > 12: # 오전 13시라는 입력이 들어온 경우, Exception 처리
             return make_response({"resultCode": "exception_common",
                                 "output": "exception_common"})
     else:
-        if wakeup_time_hour < 12:
+        if wakeup_time_hour < 12: # 오후 3시라는 입력이 들어온 경우, 15시로 변경.
             wakeup_time_hour += 12
-
-    kst_now, time_one, time_two, time_three = time_calculate(wakeup_time_hour, wakeup_time_min)
+    
+    # time_calculate 함수를 호출하여 각 변수에 대입.
+    kst_now, time_one, time_two, time_three = time_calculate(wakeup_time_hour, wakeup_time_min) 
 
     output_times = dict()
-
-    print(f"wakeup_time_hour = {wakeup_time_hour}")
-    print(f"wakeup_time_min = {wakeup_time_min}")
-    print(kst_now)
-    print(time_one)
-    print(time_two)
-    print(time_three)
 
     if kst_now < time_one:
         output_times['best_sleep_time1'] = time_transform(time_one)
@@ -231,14 +236,16 @@ def go_to_bet_time():
             }
 
     return make_response(output)
+~~~
 
 
-@application.route("/time1", methods=['POST'])
+#### 4. time_one 함수  
+Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_one, time_two, time_three 보다 이전일 때, 3가지의 시간이 모두 유효하다. 
+~~~python
 def time_one():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-    print(data)
 
     output_times['best_sleep_time1'] = data['best_sleep_time1'].get('value')
     output_times['remaine_time'] = data['remain_time'].get('value')
@@ -249,14 +256,15 @@ def time_one():
     }
 
     return make_response(output)
+~~~
 
-
-@application.route("/time2", methods=['POST'])
+#### 5. time_two 함수  
+Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_one을 지나고 time_two보다는 이전인 상태. time_two, time_three 총 2가지의 시간이 유효하다.
+~~~python
 def time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-    print(data)
 
     output_times['best_sleep_time2'] = data['best_sleep_time2'].get('value')
     output_times['remain_time'] = data['remain_time'].get('value')
@@ -267,15 +275,16 @@ def time_two():
     }
 
     return make_response(output)
+~~~
 
 
-
-@application.route("/time3", methods=['POST'])
+#### 6. time_three 함수  
+Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_two를 지나고 time_three 이전인 상태. time_three 단 한가지의 시간만이 유효하다.
+~~~python
 def time_three():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-    print(data)
 
     output_times['best_sleep_time3'] = data['best_sleep_time3'].get('value')
     output_times['remain_time'] = data['remain_time'].get('value')
@@ -286,14 +295,14 @@ def time_three():
     }
 
     return make_response(output)
+~~~
 
-
-@application.route("/later_time1", methods=['POST'])
+#### 7. later_time_one 함수
+~~~python
 def later_time_one():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
-    print(data)
 
     output_times['best_sleep_time2'] = data['best_sleep_time2'].get('value')
     output_times['best_sleep_time3'] = data['best_sleep_time3'].get('value')
@@ -304,9 +313,11 @@ def later_time_one():
     }
 
     return make_response(output)
+~~~
 
-
-@application.route("/later_time2", methods=['POST'])
+#### 7. later_time_two 함수  
+더 늦게 주무실 예정이세요? 를 처리하는 함수.
+~~~python
 def later_time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
@@ -321,23 +332,8 @@ def later_time_two():
     }
 
     return make_response(output)
+~~~
 
-
-@application.route("/default_lack_of_sleep", methods=['POST','GET'])
-def default_lack_of_sleep():
-
-    output = {
-        "resultCode": "OK",
-        "output": dict()
-    }
-
-    return make_response(output)
-
-if __name__ == '__main__':
-    application.run(host="0.0.0.0", port=5000, threaded=True)
-
-
-~~~  
 <br>
 &nbsp;
 <br>  
