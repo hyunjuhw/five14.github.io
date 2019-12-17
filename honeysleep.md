@@ -244,7 +244,7 @@ def go_to_bed_time():
         output_times['default_lack_of_sleep'] = "True"
 
 
-    # output 형태는 다음과 같습니다다.
+    # output 형태는 다음과 같습니다.
     output = {
                 "resultCode": "OK",
                 "output": output_times
