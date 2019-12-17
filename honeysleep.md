@@ -71,11 +71,11 @@
   | 사용자 | 아리아, 푹 잔 느낌 실행해줘 |  
   | NUGU | 안녕하세요, 푹 잔 느낌입니다. 몇 시에 일어나실 예정이세요? '오전 7시' 혹은 '오후 8시 30분' 처럼 말씀해 주세요. |  
   | 사용자 | 오전 8시 30분에 일어날거야. |  
-  | NUGU | 오전 1시나 오전 2시 30분에 주무시면 개운하게 일어나실 수 있어요. 더 늦게 주무실 예정인가요? |  
+  | NUGU | 오전 12시 45분이나 오전 2시 15분에 주무시면 개운하게 일어나실 수 있어요. 더 늦게 주무실 예정인가요? |  
   | 사용자 | 아니, 괜찮아 |  
   | NUGU | 푹 잔 느낌 서비스를 종료합니다. 안녕히 주무세요~ |  
 
-가장 기본이 되는 발화 흐름입니다. ‘푹 잔 느낌’ 서비스는 사용자로부터 입력받은 기상 시각 ‘오전 8시 30분’에 대해 3개의 취침 시각을 계산합니다. 수면 사이클이 90분간 지속되므로, ’7시간 30분’, ‘6시간’ 그리고 ‘4시간 30분’이 수면의 1,2단계에 기상하기 위해 적절한 수면 시간입니다. 따라서 취침 시각 목록은 ‘오전 1시’, ‘오전 2시 30분’과 ‘오전 4시’가 됩니다.
+가장 기본이 되는 발화 흐름입니다. ‘푹 잔 느낌’ 서비스는 사용자로부터 입력받은 기상 시각 ‘오전 8시 30분’에 대해 3개의 취침 시각을 계산합니다. 수면 사이클이 90분간 지속되므로, ’7시간 30분’, ‘6시간’ 그리고 ‘4시간 30분’이 수면의 1,2단계에 기상하기 위해 적절한 수면 시간입니다. 여기에 잠에 드는 시간인 약 15분 정도를 고려하여 취침 시각 목록은 ‘오전 12시 45분’, ‘오전 2시 15분’과 ‘오전 3시 45분’이 됩니다.
 
 이 중에서 현재 시각을 고려해 두개의 값을 골라 사용자에게 전달합니다. 사용자에게 알려준 취침 시각이 이미 지나갔다면 의미가 없을테니까요. 혹시 더 늦게 취침하고 싶은 사용자를 위해 ‘더 늦게 주무실 예정인가요?’ 와 같은 추가질문도 제공합니다.
 
@@ -91,7 +91,7 @@
   | 사용자 | 아리아, 푹 잔 느낌 실행해줘 |  
   | NUGU | 안녕하세요, 푹 잔 느낌입니다. 몇 시에 일어나실 예정이세요? '오전 7시' 혹은 '오후 8시 30분' 처럼 말씀해 주세요. |  
   | 사용자 | (현재 시각이 오전 3시)오전 8시 30분에 일어날거야. |  
-  | NUGU | 오전 4시에 주무시면 됩니다. 1시간 남았네요. 안녕히 주무세요~ |  
+  | NUGU | 오전 3시 45분에 주무시면 됩니다. 45분 남았네요. 안녕히 주무세요~ |  
   
   
 위의 예시처럼, 하나의 취침 시각을 알려주고 그 시각까지 남은 시간을 계산하여 알려줍니다. 그리고 취침 시각 목록에 더 남은 시각이 없기 때문에 ‘더 늦게 주무실 예정인가요?’ 등의 추가 질문 없이 서비스를 종료합니다.  
@@ -128,9 +128,9 @@ import json
 Olson 시간대 데이터베이스를 기준으로 한 세계 시간대 정의를 위한 라이브러리. 'Asia/Seoul' 한국 시간대를 가져오기 위해서 사용하였다.  
 ##### * datetime
 시간 처리를 위한 라이브러리. 위의 pytz를 통해 한국 시간대를 가져와 datetime 객체 내부의 timezone 속성을 바꿔준다. 
-
-
-
+<br>
+&nbsp;
+<br>
 #### 2. time_calculate 함수  
 go_to_bed_time 함수에서 내부 호출되는 함수입니다. 기상시간의 'hour'와 'min' 값을 전달받아 사용자에게 알려줄 시간 리스트(time_one, time_two, time_three)를 계산합니다. 서버의 시간의 UST로 설정이 되어있기 때문에, 시간 리스트 처리전에 pytz 라이브러리를 사용하여 한국 시간대로 변경해 줍니다.  
   
@@ -153,42 +153,12 @@ def time_calculate(hour, min):
 
     return kst_now, time_one, time_two, time_three
 ~~~
-
-#### 3. time_transform 함수
-~~~python
-def time_transform(input_time):
-
-    try:
-        ampm = "오후" if input_time.hour>12 else "오전"
-        sleep_hour = input_time.hour-12 if input_time.hour>12 else input_time.hour
-        if sleep_hour == 0:
-            sleep_hour = 12
-
-        
-        result = f"{ampm} {sleep_hour}시"
-        
-        if input_time.minute != 0:
-            result += f" {input_time.minute}분"
-
-        return result
-
-    except AttributeError:
-
-        sleep_hour = input_time.seconds // 3600
-        sleep_min = input_time.seconds % 3600 // 60
-
-        if sleep_hour != 0:
-            result = f"{sleep_hour}시간"
-            if sleep_min != 0:
-                result += f" {sleep_min}분"
-        else:
-            result = f"{sleep_min}분"
-
-        return result
-~~~
-
+<br>
+&nbsp;
+<br>  
+  
 #### 3. go_to_bed_time 함수  
-사용자의 기상 시간(예를 들어, 오전 7시 30분)을 전달 받아 가장 먼저 시작되는 함수입니다. 입력된 시간을 
+사용자의 기상 시간(예를 들어, 오전 7시 30분)을 전달 받아 가장 먼저 시작되는 함수입니다. 받아온 시간을 형식에 맞게 처리해준 뒤, time_caculate 함수를 호출하여 변수(kst_now, time_one, time_two, time_three)에 값을 설정해줍니다. 이 설정된 값들은 아래에 있는 time_one, time_two, time_three 함수에 전달됩니다.  
 ~~~python
 def go_to_bed_time():
 
@@ -212,7 +182,8 @@ def go_to_bed_time():
     kst_now, time_one, time_two, time_three = time_calculate(wakeup_time_hour, wakeup_time_min) 
 
     output_times = dict()
-
+    
+    # 현재 시간이 어느 곳에 위치하는지에 따라 best_sleep_time을 각각 설정해줍니다.
     if kst_now < time_one:
         output_times['best_sleep_time1'] = time_transform(time_one)
         output_times['best_sleep_time2'] = time_transform(time_two)
@@ -229,24 +200,33 @@ def go_to_bed_time():
         output_times['default_lack_of_sleep'] = "True"
 
 
-    # output 형태느 다음과 같다.
+    # output 형태는 다음과 같습니다다.
     output = {
                 "resultCode": "OK",
                 "output": output_times
             }
 
     return make_response(output)
-~~~
-
-
+~~~  
+<br>
+&nbsp;
+<br>  
+  
+#### <u>다음 4 ~ 6은 RESTful를 통해 Play builder에서 미리 정의한 Backend 파라미터로 값을 전달해주는 response 함수입니다.<u/>  
+<br>
+&nbsp;
+<br>  
+  
 #### 4. time_one 함수  
-Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_one, time_two, time_three 보다 이전일 때, 3가지의 시간이 모두 유효하다. 
+사용자가 '푹 잔 느낌' 서비스를 호출 시점이 계산된 time_one, time_two, time_three 보다 이전일 때, 3가지의 시간이 모두 유효합니다. 따라서, 3가지 시간을 모두 알려줍니다.  
+
 ~~~python
 def time_one():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
 
     output_times = dict()
 
+    # 위의 go_to_bed_time에서 계산된 결과값을 리턴합니다.
     output_times['best_sleep_time1'] = data['best_sleep_time1'].get('value')
     output_times['remaine_time'] = data['remain_time'].get('value')
 
@@ -257,7 +237,10 @@ def time_one():
 
     return make_response(output)
 ~~~
-
+<br>
+&nbsp;
+<br>  
+  
 #### 5. time_two 함수  
 Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_one을 지나고 time_two보다는 이전인 상태. time_two, time_three 총 2가지의 시간이 유효하다.
 ~~~python
@@ -276,8 +259,10 @@ def time_two():
 
     return make_response(output)
 ~~~
-
-
+<br>
+&nbsp;
+<br>  
+  
 #### 6. time_three 함수  
 Response 함수. 사용자가 '푹 잔 느낌' 서비스를 호출한 당시의 시간이 계산된 time_two를 지나고 time_three 이전인 상태. time_three 단 한가지의 시간만이 유효하다.
 ~~~python
@@ -296,7 +281,10 @@ def time_three():
 
     return make_response(output)
 ~~~
-
+<br>
+&nbsp;
+<br>  
+  
 #### 7. later_time_one 함수
 ~~~python
 def later_time_one():
@@ -314,8 +302,11 @@ def later_time_one():
 
     return make_response(output)
 ~~~
-
-#### 7. later_time_two 함수  
+<br>
+&nbsp;
+<br>  
+  
+#### 8. later_time_two 함수  
 더 늦게 주무실 예정이세요? 를 처리하는 함수.
 ~~~python
 def later_time_two():
@@ -333,7 +324,6 @@ def later_time_two():
 
     return make_response(output)
 ~~~
-
 <br>
 &nbsp;
 <br>  
