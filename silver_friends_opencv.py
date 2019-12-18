@@ -30,10 +30,10 @@ w_margin= 100
 h_margin= 120
 wmax= 200
 
-cnt_up=0
-cnt_down=0
-line_down_color=(255,0,0)
-line_up_color=(0,0,255)
+cnt_out=0
+cnt_in=0
+line_in_color=(255,0,0)
+line_out_color=(0,0,255)
 
 frame = cap.read()
 frame = imutils.resize(frame, width=min(320, frame.shape[1]))
@@ -106,12 +106,12 @@ while True:
             #   펄슨 객체 리스트에 등록된 객체가 여전히 프레임 안에 있으면서 제대로 인식이 되고 있는지 확인
             #################
         for i in persons:
-            i.updateDingimas(i.getDingimas()+1) # 각 퍼슨 객체가 인식되지 않은 프레임 수를 1씩 더해서 계산.
-            # 만약 Dingimas가 25 이상이면,(즉 25 프레임 동안 해당 퍼슨 객체가 프레임 내에서 발견되지 않았으면)
+            i.outdateInvisibleCount(i.getInvisibleCount()+1) # 각 퍼슨 객체가 인식되지 않은 프레임 수를 1씩 더해서 계산.
+            # 만약 InvisibleCount가 25 이상이면,(즉 25 프레임 동안 해당 퍼슨 객체가 프레임 내에서 발견되지 않았으면)
             # 해당 퍼슨은 더이상 프레임 내에 존재하지 않는다는 의미로 간주하고 해당 퍼슨을 퍼슨스 리스트에서 제거.
-            # 그 이유는 현재 프레임 내에 존재하는 컨투어와 퍼슨을 비교해서 동일한 영역이 발견될 경우 해당 퍼슨의 dingimas를
+            # 그 이유는 현재 프레임 내에 존재하는 컨투어와 퍼슨을 비교해서 동일한 영역이 발견될 경우 해당 퍼슨의 InvisibleCount를
             # 0으로 업데이트 하기 때문.
-            if i.getDingimas() > 10:
+            if i.getInvisibleCount() > 10:
                 persons.remove(i)
 
         if area > areaTH:
@@ -134,8 +134,8 @@ while True:
                 # 즉, 같은사람에게 계속해서 새로운 번호가 할당되는 문제가 발생할 경우 높이 마진과 넓이 마진을 셋팅하면 됨.
                 if abs(x-i.getX()) <= w_margin and abs(y-i.getY()) <= h_margin:
                     new = False
-                    i.updateCoords(cx,cy)  # 해당 사람의 중심값 새로 업데이트.
-                    i.updateDingimas(0) # dingima 초기화 하기.
+                    i.outdateCoords(cx,cy)  # 해당 사람의 중심값 새로 업데이트.
+                    i.outdateInvisibleCount(0) # dingima 초기화 하기.
                     break
 
                 # 그게 아닐경우 해당 컨투어는 새로운 사람으로 인식된다.
@@ -161,12 +161,12 @@ while True:
          #################
         if i.getDir() == None:
             i.kurEina( pts_L2[0,1] ,pts_L1[0,1])   #      def kurEina(bSottom_line,top_line):
-            if i.getDir() == 'up':
-                cnt_up+=1
-                print('Timestamp: {:%H:%M:%S} UP {}'.format(datetime.datetime.now(), cnt_up))
-            elif i.getDir() == 'down':
-                cnt_down+=1
-                print('Timestamp: {:%H:%M:%S} DOWN {}'.format(datetime.datetime.now(), cnt_down))
+            if i.getDir() == 'out':
+                cnt_out+=1
+                print('Timestamp: {:%H:%M:%S} OUT {}'.format(datetime.datetime.now(), cnt_out))
+            elif i.getDir() == 'in':
+                cnt_in+=1
+                print('Timestamp: {:%H:%M:%S} IN {}'.format(datetime.datetime.now(), cnt_in))
 
 
 
@@ -175,12 +175,12 @@ while True:
     #########################
     # 화면에 카운트와 인 라인, 아웃 라인, 텍스트를 표시하기 위한 부분.
     #########################
-    str_up='IN: '+ str(cnt_up)
-    str_down='OUT: '+ str(cnt_down)
-    frame = cv2.polylines( frame, [pts_L1], False, line_down_color,thickness=4)
-    frame = cv2.polylines( frame, [pts_L2], False, line_up_color,thickness=4)
-    cv2.putText(frame, str_up, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
-    cv2.putText(frame, str_down, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
+    str_out='OUT: '+ str(cnt_out)
+    str_in='IN: '+ str(cnt_in)
+    frame = cv2.polylines( frame, [pts_L1], False, line_in_color,thickness=4)
+    frame = cv2.polylines( frame, [pts_L2], False, line_out_color,thickness=4)
+    cv2.putText(frame, str_out, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
+    cv2.putText(frame, str_in, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
 
 
     cv2.imshow('Frame',frame)
