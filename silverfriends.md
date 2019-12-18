@@ -31,15 +31,20 @@
 &nbsp;
 <br>    ㅤ
   
-### 사용 기술
+### OpenCV 및 라즈베리파이
 -----------------------------------------------
-##### * OpenCV & People Counting
 라즈베리파이, 카메라 모듈과 openCV를 활용하여 People Counter(인원 계수기)를 만들고 이를 경로당 출입문에 설치합니다.  
 카메라에서 전송되는 영상을 실시간으로 분석해 People Counting기능을 구현하고, 해당 공간에 몇 명이 있는지 알려줍니다.  
   
 ![](./image/silverfriend/people_count.png)
 
 > **공간에 들어온 인원 수 - 공간을 나간 인원 수 = 현재 공간에 있는 인원 수**  
+  
+#### * OpenCV란?
+  <u>경희야 여기에 오픈씨브이 설명좀 써줘!</u>  
+   
+#### * 라즈베리파이란?
+  <u>경희야 여기에 라즈베리파이 설명좀 써줘!</u>  
 <br>
 &nbsp;
 <br>    ㅤ
@@ -89,15 +94,15 @@
 --------------------------
 '경로당 친구들'프로젝트는 다음과 같이 4개의 부분으로 나누어져 진행되었습니다.  
  
-> 1. 라즈베리파이를 이용한 People Counter 개발
-> 2. 프록시 서버 및 DB 개발
-> 3. 경로당 등록 기능 프로토타이핑
-> 4. NUGU Play개발(Play Builder) 및 연동  
+> A. 라즈베리파이를 이용한 People Counter 개발
+> B. 프록시 서버 및 DB 개발
+> C. 경로당 등록 기능 프로토타이핑
+> D. NUGU Play개발(Play Builder) 및 연동  
 <br>
 &nbsp;
 <br>    ㅤ
   
-### 1. 라즈베리파이를 이용한 People Counter 개발
+### A. 라즈베리파이를 이용한 People Counter 개발
 --------------------------
 #### 1. 필요한 모듈
 ~~~python
@@ -246,14 +251,14 @@ from imutils.video import VideoStream
 &nbsp;
 <br>    ㅤ
   
-### 2. 프록시 서버 및 DB 개발
+### B. 프록시 서버 및 DB 개발
 --------------------------
 코드는 내일 옵니다.
 <br>
 &nbsp;
 <br>    ㅤ
   
-### 3. 경로당 등록 기능 프로토타이핑
+### C. 경로당 등록 기능 프로토타이핑
 --------------------------
 프로토 타이핑된 이미지 넣으면 될 듯
 <br>
@@ -262,6 +267,10 @@ from imutils.video import VideoStream
   
 ### 관련 및 참고 자료
 --------------------------
+#### 1. OpenCV 영상 참고 자료 및 관련 코드
+[![openCV Video](http://img.youtube.com/vi/S26G0a7u9d4/0.jpg)](https://www.youtube.com/watch?v=S26G0a7u9d4)  
+Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-raspberry)](https://github.com/donce71/Pedestrians-counter-raspberry)
+  
 <br>
 &nbsp;
 <br>    ㅤ
