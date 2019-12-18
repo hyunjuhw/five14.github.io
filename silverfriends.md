@@ -125,7 +125,13 @@ openCV관련 오픈 소스 라이브러리. 영상 처리 속도 개선을 위�
   
 #### 2. Mog2 Substractor 적용 및 프레임 바이너리화  
 <br>
-인식률을 높이기 위해 Mog2 알고리즘을 활용한 Mog2 Substractor를 사용하여 배경을 제거한다. 배경이 제거된 뒤, 프레임을 흰색과 검은색 두 색으로만 보일 수 있도록 바이너리화를 진행한다. 
+인식률을 높이기 위해 Mog2 알고리즘을 활용한 Mog2 Substractor를 사용하여 배경을 제거한다.
+MOG2는 가우시안 혼합 기반 배경/전경 분할 알고리즘이다.
+해당 알고리즘이 적용된 뒤의 프레임은 동적인 부분은 흰색으로, 그리고 정적인 부분은 검정색으로 바뀌어서 배경과 움직이는 물체를 구분 할 수 있게 해준다.
+Mog2 substraction이 적용된 뒤에는 검정색과 흰색외에는 존재하지 않도록, 프레임을 단순화 시키기 위해 이진화를 진행한다.
+따라서 이 과정을 통해서 프레임에는 검정색 화소와 흰색 화소만 남아있게 된다. 정적인 부분은 흰색으로 남는다.
+이후의 단계에서는 이렇게 substraction 및 binarization 이 완료된 프레임 대상으로 컨투어링(외곽선 그리기)를 진행하고, 이를 바탕으로 움직이는 사람을 추적하고 인식 할 수 있게 된다.
+
 ~~~python
     # Mog2 Substractor 적용
     fgmask = fgbg.apply(frame)
@@ -140,7 +146,13 @@ openCV관련 오픈 소스 라이브러리. 영상 처리 속도 개선을 위�
 ~~~
   
   
-#### 3. 인식된 Person 객체의 컨투어(외곽선)  
+#### 3. 만약 컨투어링(외곽선 그리기) 진행 후, 너무 큰 객체 분할 하기.
+<br>
+인식된 각 객체의 너비(width)가 설정한 wmax 값 보다 크다면 이는 한사람 이상의 사람이 하나의 컨투어링 된 객체 안에 있다는 의미 이므로,
+객체의 중심점을 기준으로 반으로 나눠준다.
+오브젝트 트래킹은 mask2 프레임을 대상으로 진행하는데, 만약 분할해야 할 객체가 존재할 경우 substraction 및 이진화가 완료된 mask 프레임에 분할선을 그어 mask2에 할당해주고 ( mask2_flag=1 인 경우 )
+분할해야 할 객체가 존재 하지 않는 경우에는, 그대로 mask 프레임을 mask2 프레임에 할당해준다.
+
 ~~~python
     mask2_flag=0
 
@@ -163,16 +175,19 @@ openCV관련 오픈 소스 라이브러리. 영상 처리 속도 개선을 위�
 
 
 #### 4. 오브젝트 트래킹  
-  
-Dingimas는 프레임 카운트 수입니다.   
+
+mask2 프레임 대상으로 오브젝트 트래킹을 진행한다. InvisibleCount는 프레임 카운트 딜레이 수이다. 우리는 인식된 각 객체를 Person 클래스를 통해 Person 객체를 생성해
+persons 리스트에 각각의 객체를 append 한다. 따라서 persons 리스트에는 현재 프로그램이 트래킹 중인 Person 객체가 모두 들어있는데, 여기서는 해당 Person 객체 리스트에 들어있는 각각의 Person 객체에 대해 InvisibleCount 값을 1씩 증가시키고, 만약 이 값이 if 문을 통해 지정한 값보다 클 경우, 해당 Person 객체는 현재 카메라가 보고 있는 화면 내에 일정 프레임 수 이상 동안 존재하지 않았다는 것을 의미하기 때문에 persons 리스트에서 해당 Person 객체를 제거한다.
+그리고 설정한 areaTH 값보다 큰 area를 가진 컨투어링 된 객체가 있을 때 마다 해당 객체를 persons 리스트에 존재하는 모든 Person 객체들의 중심값과 컨투어링 객체를 bounding 한 사각형의 시작 포인트 (x, y)와 비교했을 때 x와 Person 객체의 중심값 x의 차가 설정한 너비마진 보다 작거나 같고, 또 y와 객체의 중심값 y의 차가 설정한 높이마진 보다 작거나 같은 경우, 해당 컨투어링 객체는 비교한 Person 객체와 동일한 객체라고 볼 수 있기 때문에(따라서 너비마진 값과 높이 마진 값을 어떻게 설정하느냐에 따라 인식률이 달라진다.) 중심값을 해당 컨투어링 박스의 중심값으로 새로 업데이트 해주고 InvisibleCount 값을 0으로 업데이트 해준다. 0으로 업데이트 해주는 이유는, InvisibleCount 값이 일정 값 이상 넘어가면 해당 객체를 더이상 트래킹 하지 않아도 되는 것으로 판단 하기 때문에 현재 프레임에서 발견된 Person 객체는 최근에 발견되었으므로 다시 0으로 업데이트 해주는 것이다. 만약 계속해서 프레임 내에서 발견되지 않아서 0으로 업데이트 되지 않은 Person 객체는 프레임이 지나갈수록 InvisibleCount 값이 쌓여서 얼마 후에 persons 리스트에서 제거 될 것이다.
+
 ~~~python
         for i in persons: # 현재 추척하고 있는 Person 객체의 리스트
-            i.updateDingimas(i.getDingimas()+1) # 각 퍼슨 객체가 인식되지 않은 프레임 수를 1씩 더해서 계산.
-            # 만약 Dingimas가 25 이상이면,(즉 25 프레임 동안 해당 퍼슨 객체가 프레임 내에서 발견되지 않았으면)
+            i.outdateInvisibleCount(i.getInvisibleCount()+1) # 각 퍼슨 객체가 인식되지 않은 프레임 수를 1씩 더해서 계산.
+            # 만약 InvisibleCount가 25 이상이면,(즉 25 프레임 동안 해당 퍼슨 객체가 프레임 내에서 발견되지 않았으면)
             # 해당 퍼슨은 더이상 프레임 내에 존재하지 않는다는 의미로 간주하고 해당 퍼슨을 퍼슨스 리스트에서 제거.
-            # 그 이유는 현재 프레임 내에 존재하는 컨투어와 퍼슨을 비교해서 동일한 영역이 발견될 경우 해당 퍼슨의 dingimas를
+            # 그 이유는 현재 프레임 내에 존재하는 컨투어와 퍼슨을 비교해서 동일한 영역이 발견될 경우 해당 퍼슨의 InvisibleCount를
             # 0으로 업데이트 하기 때문.
-            if i.getDingimas() > 10:
+            if i.getInvisibleCount() > 10:
                 persons.remove(i)
 
         if area > areaTH:
@@ -189,14 +204,14 @@ Dingimas는 프레임 카운트 수입니다.
             new = True
             # 현재 펄슨스 객체 리스트에 등록된 각 펄슨 객체에 대하여 비교.
             for i in persons:
-                # 각각의 퍼슨 객체와 비교했을때 그 차가 설정한 넓이마진과 높이마진 보다 작거나 같으면
+                # 각각의 퍼슨 객체와 비교했을때 그 차가 설정한 너비마진과 높이마진 보다 작거나 같으면
                 # 해당 컨투어 영역은 새로 발견된 사람이 아니다.
                 # 따라서 new 를 False로 바꾼다
                 # 즉, 같은사람에게 계속해서 새로운 번호가 할당되는 문제가 발생할 경우 높이 마진과 넓이 마진을 셋팅하면 됨.
                 if abs(x-i.getX()) <= w_margin and abs(y-i.getY()) <= h_margin:
                     new = False
-                    i.updateCoords(cx,cy)  # 해당 사람의 중심값 새로 업데이트.
-                    i.updateDingimas(0) # dingima 초기화 하기.
+                    i.outdateCoords(cx,cy)  # 해당 사람의 중심값 새로 업데이트.
+                    i.outdateInvisibleCount(0) # dingima 초기화 하기.
                     break
 
                 # 그게 아닐경우 해당 컨투어는 새로운 사람으로 인식된다.
@@ -209,7 +224,11 @@ Dingimas는 프레임 카운트 수입니다.
             cv2.circle(frame,(cx,cy), 5, (0,0,255), -1)
 ~~~  
   
-#### 5. 추적중인 객체의 트래킹 라인을 출력한다. & 선이 교차했다면 지나간 라인에 해당하는 수를 카운트한다
+#### 5. 추적중인 객체의 트래킹 라인을 출력한다. 그리고 트래킹 라인과 inLine 혹은 outLine이 교차했다면 지나간 라인에 해당하는 수(in카운트 혹은 out 카운트)를 카운트한다.
+
+트래킹 라인은 매 프레임 마다 트래킹 되는 객체의 중심값들을 이어서 그린다. 이는 Person 객체의 tracks 리스트 속성에 객체의 중심값들이 append 되면서 그려진다. 따라서 최소 tracks 리스트의 길이가 2 이상인 객체들을 대상으로만 라인을 그리고 객체의 방향이 out인지 in인지 정한다.
+kurEina 함수는 객체의 방향을 판단해 dir 속성을 in 혹은 out으로 할당하고 이에 해당하는 카운트 변수를 카운트한다.
+
 ~~~python
     #########################
     # 추적중인 객체의 트래킹 라인을 출력한다.
@@ -224,13 +243,31 @@ Dingimas는 프레임 카운트 수입니다.
          #  선이 교차했다면 지나간 라인에 해당하는 수를 카운트한다.
          #################
         if i.getDir() == None:
-            i.kurEina( pts_L2[0,1] ,pts_L1[0,1])   #      def kurEina(bSottom_line,top_line):
-            if i.getDir() == 'up':
-                cnt_up+=1
-                print('Timestamp: {:%H:%M:%S} UP {}'.format(datetime.datetime.now(), cnt_up))
-            elif i.getDir() == 'down':
-                cnt_down+=1
-                print('Timestamp: {:%H:%M:%S} DOWN {}'.format(datetime.datetime.now(), cnt_down))
+            i.kurEina( pts_L2[0,1] ,pts_L1[0,1]) 
+    
+    # Person 클래스 내에 존재하는 kurEina 함수. pts_L2는 out 라인이고 pts_L1는 in 라인이다
+    # def kurEina(self,bottom_line,top_line):
+    #     if len(self.tracks) >= 2:
+    #         if self.dir == None:
+    #             self.cross_bottom(bottom_line)
+    #             self.cross_top(top_line)
+            # 각각 line과 line2는 해당 Person 객체의 트래킹 라인이 첫번째로 만난 라인과 두번째로 만난 라인을 의미한다.
+            # 따라서 첫번째로 만난 라인이 위에 있는 in 라인이고 두번째로 만난 라인이 밑에 있는 out 라인일 경우에, 방향을 in 으로 한다.
+    #             if  self.line1== 'top' and self.line2== 'bottom':
+    #                 self.dir = 'in'
+            # 그 외 첫번째 만난 라인이 아래쪽에 있는 out 라인이고 두번째로 만난 라인이 위에 있는 in 라인인 경우에는 방향을 out으로 한다.
+    #             elif  self.line1== 'bottom' and self.line2== 'top':
+    #                 self.dir = 'out'
+    #     else:
+    #         return False              
+    
+    # kurEina 함수를 통해 계산된 방향이 out일 경우에 out 카운트를 증가시키고, in 일 경우에 in 카운트를 증가 시킨다.
+            if i.getDir() == 'out':
+                cnt_out+=1
+                print('Timestamp: {:%H:%M:%S} OUT {}'.format(datetime.datetime.now(), cnt_out))
+            elif i.getDir() == 'in':
+                cnt_in+=1
+                print('Timestamp: {:%H:%M:%S} IN {}'.format(datetime.datetime.now(), cnt_in))
 
 
 
@@ -239,16 +276,19 @@ Dingimas는 프레임 카운트 수입니다.
   
   
 #### 6. 화면에 카운트와 인 라인, 아웃 라인, 텍스트를 표시하기 위한 부분.
+
+in line을 파란색으로, out line을 빨간색으로, 화면에 표시하고. 카운트 되는 각 카운트를 화면 위에 표시해 준다.
+
 ~~~python
     #########################
     # 화면에 카운트와 인 라인, 아웃 라인, 텍스트를 표시하기 위한 부분.
     #########################
-    str_up='IN: '+ str(cnt_up)
-    str_down='OUT: '+ str(cnt_down)
-    frame = cv2.polylines( frame, [pts_L1], False, line_down_color,thickness=4)
-    frame = cv2.polylines( frame, [pts_L2], False, line_up_color,thickness=4)
-    cv2.putText(frame, str_up, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
-    cv2.putText(frame, str_down, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
+    str_out='OUT: '+ str(cnt_out)
+    str_in='IN: '+ str(cnt_in)
+    frame = cv2.polylines( frame, [pts_L1], False, line_in_color,thickness=4)
+    frame = cv2.polylines( frame, [pts_L2], False, line_out_color,thickness=4)
+    cv2.putText(frame, str_out, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
+    cv2.putText(frame, str_in, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
 ~~~
   
 코드 전체를 보고 싶은 분은 [경로당 친구들 openCV](https://github.com/hyunjuhw/five14.github.io/blob/master/silver_friends_opencv.py)를 참고해주세요.  
