@@ -9,9 +9,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;한양대학교 정보시스템학과 변보선, eoqkr1217@hanyang.ac.kr    
 &nbsp;&nbsp;&nbsp;&nbsp;한양대학교 정보시스템학과 장경희, gkdlfl1237@gmail.com  
 &nbsp;&nbsp;&nbsp;&nbsp;한양대학교 정보시스템학과 황현주, dbsg0068@gmail.com    
-<br>
-&nbsp;
-<br>    ㅤ
+     ㅤ
   
 ### 아이디어 및 배경 소개  
 -----------------------------------------------
@@ -94,9 +92,9 @@
 --------------------------
 '경로당 친구들'프로젝트는 다음과 같이 4개의 부분으로 나누어져 진행되었습니다.  
  
-> A. 라즈베리파이를 이용한 People Counter 개발
-> B. 프록시 서버 및 DB 개발
-> C. 경로당 등록 기능 프로토타이핑
+> A. 라즈베리파이를 이용한 People Counter 개발  
+> B. 프록시 서버 및 DB 개발  
+> C. 경로당 등록 기능 프로토타이핑  
 > D. NUGU Play개발(Play Builder) 및 연동  
 <br>
 &nbsp;
@@ -113,7 +111,14 @@ import time
 import imutils
 import datetime
 from imutils.video import VideoStream
-~~~
+~~~  
+##### * cv2
+오픈씨브이 라이브러리 설명 좀 더. 
+##### * Person
+카메라로 인식한 사람 객체를 정의한 클래스 파일
+##### * imutils
+openCV관련 오픈 소스 라이브러리. 영상 처리 속도 개선을 위해 사용.
+
 <br>
 &nbsp;
 <br>    ㅤ
