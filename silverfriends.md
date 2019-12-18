@@ -92,308 +92,144 @@
  > 4. NUGU Play개발(Play Builder) 및 연동
  
  
- ### 코드 설명  
- --------------------------
- 
- ~~~python
-     # USAGE
-    # To read and write back out to video:
-    # python people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt \
-    #	--model mobilenet_ssd/MobileNetSSD_deploy.caffemodel --input videos/example_01.mp4 \
-    #	--output output/output_01.avi
-    #
-    # To read from webcam and write back out to disk:
-    # python people_counter.py --prototxt mobilenet_ssd/MobileNetSSD_deploy.prototxt \
-    #	--model mobilenet_ssd/MobileNetSSD_deploy.caffemodel \
-    #	--output output/webcam_output.avi
-
-    # import the necessary packages
-    from pyimagesearch.centroidtracker import CentroidTracker
-    from pyimagesearch.trackableobject import TrackableObject
-    from imutils.video import VideoStream
-    from imutils.video import FPS
+### 코드 설명  
+--------------------------
+#### 1. 필요한 모듈
+~~~python
     import numpy as np
-    import argparse
-    import imutils
-    import time
-    import dlib
-    import cv2
+import cv2
+import Person
+import time
+import imutils
+import datetime
+from imutils.video import VideoStream
+~~~
+  
 
-    # construct the argument parse and parse the arguments
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-p", "--prototxt", required=True,
-        help="path to Caffe 'deploy' prototxt file")
-    ap.add_argument("-m", "--model", required=True,
-        help="path to Caffe pre-trained model")
-    ap.add_argument("-i", "--input", type=str,
-        help="path to optional input video file")
-    ap.add_argument("-o", "--output", type=str,
-        help="path to optional output video file")
-    ap.add_argument("-c", "--confidence", type=float, default=0.4,
-        help="minimum probability to filter weak detections")
-    ap.add_argument("-s", "--skip-frames", type=int, default=30,
-        help="# of skip frames between detections")
-    args = vars(ap.parse_args())
+#### 2. Mog2 Substractor 적용 및 프레임 바이너리화   
+~~~python
+    # Mog2 Substractor 적용
+    fgmask = fgbg.apply(frame)
 
-    # initialize the list of class labels MobileNet SSD was trained to
-    # detect
-    CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-        "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-        "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-        "sofa", "train", "tvmonitor"]
+    try:
+        ret,imBin= cv2.threshold(fgmask,200,255,cv2.THRESH_BINARY)
+        mask0 =  cv2.morphologyEx(imBin ,  cv2.MORPH_OPEN, kernelOp2)
+        mask =  cv2.morphologyEx(mask0 , cv2.MORPH_CLOSE, kernelCl2)
+    except:
+        print('EOF')
+        break
+~~~
+  
+  
+#### 3. 컨투어가 너무 큰경우 반으로 자른다   
+~~~python
+########컨투어가 너무 큰경우 반으로 자른다
+    mask2_flag=0
 
-    # load our serialized model from disk
-    print("[INFO] loading model...")
-    net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+    for cnt in contours0:
+        area = cv2.contourArea(cnt)
+        if area > areaTH :
+            x,y,w,h = cv2.boundingRect(cnt)
 
-    # if a video path was not supplied, grab a reference to the webcam
-    if not args.get("input", False):
-        print("[INFO] starting video stream...")
-        vs = VideoStream(src=0).start()
-        time.sleep(2.0)
+            # wmax 는 한사람의 최대넓이. 만약 바운딩 렉트의 넓이가 설정한 wmax 보다 크다면 두사람이 붙어있는 거니까
+            # 중간을 딱 잘라버린다.
+            if w > wmax:
 
-    # otherwise, grab a reference to the video file
-    else:
-        print("[INFO] opening video file...")
-        vs = cv2.VideoCapture(args["input"])
+                mask2 = cv2.line( mask, (int(x+w/2), 0), (int(x+w/2),min(320, frame.shape[1])),(0,0,0), 10)
 
-    # initialize the video writer (we'll instantiate later if need be)
-        writer = None
+                mask2_flag=1
 
-    # initialize the frame dimensions (we'll set them as soon as we read
-    # the first frame from the video)
-        W = None
-        H = None
+    if mask2_flag==0:
+        mask2=mask
+~~~
 
-    # instantiate our centroid tracker, then initialize a list to store
-    # each of our dlib correlation trackers, followed by a dictionary to
-    # map each unique object ID to a TrackableObject
-        ct = CentroidTracker(maxDisappeared=40, maxDistance=50)
-        trackers = []
-        trackableObjects = {}
 
-    # initialize the total number of frames processed thus far, along
-    # with the total number of objects that have moved either up or down
-        totalFrames = 0
-        totalDown = 0
-        totalUp = 0
+#### 4. 펄슨 객체 리스트에 등록된 객체가 여전히 프레임 안에 있으면서 제대로 인식이 되고 있는지 확인   
+~~~python
+            #################
+            #   펄슨 객체 리스트에 등록된 객체가 여전히 프레임 안에 있으면서 제대로 인식이 되고 있는지 확인
+            #################
+        for i in persons:
+            i.updateDingimas(i.getDingimas()+1) # 각 퍼슨 객체가 인식되지 않은 프레임 수를 1씩 더해서 계산.
+            # 만약 Dingimas가 25 이상이면,(즉 25 프레임 동안 해당 퍼슨 객체가 프레임 내에서 발견되지 않았으면)
+            # 해당 퍼슨은 더이상 프레임 내에 존재하지 않는다는 의미로 간주하고 해당 퍼슨을 퍼슨스 리스트에서 제거.
+            # 그 이유는 현재 프레임 내에 존재하는 컨투어와 퍼슨을 비교해서 동일한 영역이 발견될 경우 해당 퍼슨의 dingimas를
+            # 0으로 업데이트 하기 때문.
+            if i.getDingimas() > 10:
+                persons.remove(i)
 
-    # start the frames per second throughput estimator
-        fps = FPS().start()
+        if area > areaTH:
+            #################
+            #   오브젝트 트래킹
+            #################
+            M = cv2.moments(cnt)
+            # 무게중심 구하기
+            cx = int(M['m10']/M['m00'])
+            cy = int(M['m01']/M['m00'])
+            x,y,w,h = cv2.boundingRect(cnt)
 
-    # loop over frames from the video stream
-    while True:
-	    # grab the next frame and handle if we are reading from either
-	    # VideoCapture or VideoStream
-	    frame = vs.read()
-	    frame = frame[1] if args.get("input", False) else frame
+            # 현재 프레임 안에서 발견되는 컨투어에 각각 일단 new True로 하고
+            new = True
+            # 현재 펄슨스 객체 리스트에 등록된 각 펄슨 객체에 대하여 비교.
+            for i in persons:
+                # 각각의 퍼슨 객체와 비교했을때 그 차가 설정한 넓이마진과 높이마진 보다 작거나 같으면
+                # 해당 컨투어 영역은 새로 발견된 사람이 아니다.
+                # 따라서 new 를 False로 바꾼다
+                # 즉, 같은사람에게 계속해서 새로운 번호가 할당되는 문제가 발생할 경우 높이 마진과 넓이 마진을 셋팅하면 됨.
+                if abs(x-i.getX()) <= w_margin and abs(y-i.getY()) <= h_margin:
+                    new = False
+                    i.updateCoords(cx,cy)  # 해당 사람의 중심값 새로 업데이트.
+                    i.updateDingimas(0) # dingima 초기화 하기.
+                    break
 
-	# if we are viewing a video and we did not grab a frame then we
-	# have reached the end of the video
-	if args["input"] is not None and frame is None:
-		break
+                # 그게 아닐경우 해당 컨투어는 새로운 사람으로 인식된다.
+                # 따라서 새로운 퍼슨객체를 생성하고 퍼슨객체 리스트인 퍼슨스에 추가한다.
+            if new == True:
+                p = Person.MyPerson(pid,cx,cy, max_p_age)
+                persons.append(p)
+                pid += 1
 
-	# resize the frame to have a maximum width of 500 pixels (the
-	# less data we have, the faster we can process it), then convert
-	# the frame from BGR to RGB for dlib
-	frame = imutils.resize(frame, width=500)
-	rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-	# if the frame dimensions are empty, set them
-	if W is None or H is None:
-		(H, W) = frame.shape[:2]
-
-	# if we are supposed to be writing a video to disk, initialize
-	# the writer
-	if args["output"] is not None and writer is None:
-		fourcc = cv2.VideoWriter_fourcc(*"MJPG")
-		writer = cv2.VideoWriter(args["output"], fourcc, 30,
-			(W, H), True)
-
-	# initialize the current status along with our list of bounding
-	# box rectangles returned by either (1) our object detector or
-	# (2) the correlation trackers
-	status = "Waiting"
-	rects = []
-
-	# check to see if we should run a more computationally expensive
-	# object detection method to aid our tracker
-	if totalFrames % args["skip_frames"] == 0:
-		# set the status and initialize our new set of object trackers
-		status = "Detecting"
-		trackers = []
-
-		# convert the frame to a blob and pass the blob through the
-		# network and obtain the detections
-		blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
-		net.setInput(blob)
-		detections = net.forward()
-
-		# loop over the detections
-		for i in np.arange(0, detections.shape[2]):
-			# extract the confidence (i.e., probability) associated
-			# with the prediction
-			confidence = detections[0, 0, i, 2]
-
-			# filter out weak detections by requiring a minimum
-			# confidence
-			if confidence > args["confidence"]:
-				# extract the index of the class label from the
-				# detections list
-				idx = int(detections[0, 0, i, 1])
-
-				# if the class label is not a person, ignore it
-				if CLASSES[idx] != "person":
-					continue
-
-				# compute the (x, y)-coordinates of the bounding box
-				# for the object
-				box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
-				(startX, startY, endX, endY) = box.astype("int")
-
-				# construct a dlib rectangle object from the bounding
-				# box coordinates and then start the dlib correlation
-				# tracker
-				tracker = dlib.correlation_tracker()
-				rect = dlib.rectangle(startX, startY, endX, endY)
-				tracker.start_track(rgb, rect)
-
-				# add the tracker to our list of trackers so we can
-				# utilize it during skip frames
-				trackers.append(tracker)
-
-	# otherwise, we should utilize our object *trackers* rather than
-	# object *detectors* to obtain a higher frame processing throughput
-	else:
-		# loop over the trackers
-		for tracker in trackers:
-			# set the status of our system to be 'tracking' rather
-			# than 'waiting' or 'detecting'
-			status = "Tracking"
-
-			# update the tracker and grab the updated position
-			tracker.update(rgb)
-			pos = tracker.get_position()
-
-			# unpack the position object
-			startX = int(pos.left())
-			startY = int(pos.top())
-			endX = int(pos.right())
-			endY = int(pos.bottom())
-
-			# add the bounding box coordinates to the rectangles list
-			rects.append((startX, startY, endX, endY))
-
-	# draw a horizontal line in the center of the frame -- once an
-	# object crosses this line we will determine whether they were
-	# moving 'up' or 'down'
-	cv2.line(frame, (0, H // 2), (W, H // 2), (0, 255, 255), 2)
-
-	# use the centroid tracker to associate the (1) old object
-	# centroids with (2) the newly computed object centroids
-	objects = ct.update(rects)
-
-	# loop over the tracked objects
-	for (objectID, centroid) in objects.items():
-		# check to see if a trackable object exists for the current
-		# object ID
-		to = trackableObjects.get(objectID, None)
-
-		# if there is no existing trackable object, create one
-		if to is None:
-			to = TrackableObject(objectID, centroid)
-
-		# otherwise, there is a trackable object so we can utilize it
-		# to determine direction
-		else:
-			# the difference between the y-coordinate of the *current*
-			# centroid and the mean of *previous* centroids will tell
-			# us in which direction the object is moving (negative for
-			# 'up' and positive for 'down')
-			y = [c[1] for c in to.centroids]
-			direction = centroid[1] - np.mean(y)
-			to.centroids.append(centroid)
-
-			# check to see if the object has been counted or not
-			if not to.counted:
-				# if the direction is negative (indicating the object
-				# is moving up) AND the centroid is above the center
-				# line, count the object
-				if direction < 0 and centroid[1] < H // 2:
-					totalUp += 1
-					to.counted = True
-
-				# if the direction is positive (indicating the object
-				# is moving down) AND the centroid is below the
-				# center line, count the object
-				elif direction > 0 and centroid[1] > H // 2:
-					totalDown += 1
-					to.counted = True
-
-		# store the trackable object in our dictionary
-		trackableObjects[objectID] = to
-
-		# draw both the ID of the object and the centroid of the
-		# object on the output frame
-		text = "ID {}".format(objectID)
-		cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-		cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
-
-	# construct a tuple of information we will be displaying on the
-	# frame
-	info = [
-		("Up", totalUp),
-		("Down", totalDown),
-		("Status", status),
-	]
-
-	# loop over the info tuples and draw them on our frame
-	for (i, (k, v)) in enumerate(info):
-		text = "{}: {}".format(k, v)
-		cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
-
-	# check to see if we should write the frame to disk
-	if writer is not None:
-		writer.write(frame)
-
-	# show the output frame
-	cv2.imshow("Frame", frame)
-	key = cv2.waitKey(1) & 0xFF
-
-	# if the `q` key was pressed, break from the loop
-	if key == ord("q"):
-		break
-
-	# increment the total number of frames processed thus far and
-	# then update the FPS counter
-	totalFrames += 1
-	fps.update()
-
-    # stop the timer and display FPS information
-    fps.stop()
-    print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
-    # check to see if we need to release the video writer pointer
-    if writer is not None:
-	    writer.release()
-
-    # if we are not using a video file, stop the camera video stream
-    if not args.get("input", False):
-	    vs.stop()
-
-    # otherwise, release the video file pointer
-    else:
-	    vs.release()
-
-    # close any open windows
-    cv2.destroyAllWindows()
+            cv2.circle(frame,(cx,cy), 5, (0,0,255), -1)
+~~~  
+  
+#### 5. 추적중인 객체의 트래킹 라인을 출력한다. & 선이 교차했다면 지나간 라인에 해당하는 수를 카운트한다
+~~~python
+    #########################
+    # 추적중인 객체의 트래킹 라인을 출력한다.
+    #########################
+    for i in persons:
+        if len(i.getTracks()) >= 2:
+            pts = np.array(i.getTracks(), np.int32)
+            pts = pts.reshape((-1,1,2))
+            frame = cv2.polylines(frame,[pts],False,i.getRGB())
+         #################
+         #  선이 교차하는지 확인한다. 즉 트래킹라인과 업라인 혹은 다운라인이 교차하는지 파악한다.
+         #  선이 교차했다면 지나간 라인에 해당하는 수를 카운트한다.
+         #################
+        if i.getDir() == None:
+            i.kurEina( pts_L2[0,1] ,pts_L1[0,1])   #      def kurEina(bSottom_line,top_line):
+            if i.getDir() == 'up':
+                cnt_up+=1
+                print('Timestamp: {:%H:%M:%S} UP {}'.format(datetime.datetime.now(), cnt_up))
+            elif i.getDir() == 'down':
+                cnt_down+=1
+                print('Timestamp: {:%H:%M:%S} DOWN {}'.format(datetime.datetime.now(), cnt_down))
 
 
 
-
-
-
-
+        cv2.putText(frame, str(i.getId()),(i.getX(),i.getY()),font,0.7,i.getRGB(),1,cv2.LINE_AA)
+~~~
+  
+  
+#### 6. 화면에 카운트와 인 라인, 아웃 라인, 텍스트를 표시하기 위한 부분.
+~~~python
+    #########################
+    # 화면에 카운트와 인 라인, 아웃 라인, 텍스트를 표시하기 위한 부분.
+    #########################
+    str_up='IN: '+ str(cnt_up)
+    str_down='OUT: '+ str(cnt_down)
+    frame = cv2.polylines( frame, [pts_L1], False, line_down_color,thickness=4)
+    frame = cv2.polylines( frame, [pts_L2], False, line_up_color,thickness=4)
+    cv2.putText(frame, str_up, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
+    cv2.putText(frame, str_down, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
+~~~
