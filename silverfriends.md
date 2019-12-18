@@ -84,19 +84,19 @@
  
  ### 프로젝트 과정
  --------------------------
- 프로젝트의 진행 과정은 다음과 같이 4개의 부분으로 나누어져 진행되었습니다.  
+ '경로당 친구들'프로젝트는 다음과 같이 4개의 부분으로 나누어져 진행되었습니다.  
  
  > 1. 라즈베리파이를 이용한 People Counter 개발
  > 2. 프록시 서버 및 DB 개발
  > 3. 경로당 등록 기능 프로토타이핑
- > 4. NUGU Play개발(Play Builder) 및 연동
+ > 4. NUGU Play개발(Play Builder) 및 연동  
+    
  
- 
-### 코드 설명  
+### 1. 라즈베리파이를 이용한 People Counter 개발
 --------------------------
 #### 1. 필요한 모듈
 ~~~python
-    import numpy as np
+import numpy as np
 import cv2
 import Person
 import time
@@ -233,3 +233,21 @@ from imutils.video import VideoStream
     cv2.putText(frame, str_up, (10,30), font,0.5,(0,0,255), 1,cv2.LINE_AA)
     cv2.putText(frame, str_down, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
 ~~~
+  
+코드 전체를 보고 싶은 분은 [경로당 친구들 openCV](https://github.com/hyunjuhw/five14.github.io/blob/master/silver_friends_opencv.py)를 참고해주세요.  
+    
+ 
+### 2. 프록시 서버 및 DB 개발
+--------------------------
+코드는 내일 옵니다.
+ 
+### 3. 경로당 등록 기능 프로토타이핑
+--------------------------
+프로토 타이핑된 이미지 넣으면 될 듯
+ 
+### 관련 및 참고 자료
+--------------------------
+  
+ 
+### 결론
+--------------------------
