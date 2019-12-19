@@ -101,10 +101,8 @@ Open Source Computer Vision의 약자로 다양한 영상/동영상 처리에 �
 > B. 프록시 서버 및 DB 개발  
 > C. 경로당 등록 기능 프로토타이핑  
 > D. NUGU Play개발(Play Builder) 및 연동  
-<br>
-&nbsp;
-<br>    ㅤ
   
+
 ### A. 라즈베리파이를 이용한 People Counter 개발
 --------------------------
 #### 1. 필요한 모듈
