@@ -34,7 +34,7 @@
 라즈베리파이, 카메라 모듈과 openCV를 활용하여 People Counter(인원 계수기)를 만들고 이를 경로당 출입문에 설치합니다.  
 카메라에서 전송되는 영상을 실시간으로 분석해 People Counting기능을 구현하고, 해당 공간에 몇 명이 있는지 알려줍니다.  
   
-![](./image/silverfriend/people_count.png)
+<img src="./image/silverfriend/people_count.png" width="100%" />
 
 > **공간에 들어온 인원 수 - 공간을 나간 인원 수 = 현재 공간에 있는 인원 수**  
   
@@ -53,7 +53,7 @@ Open Source Computer Vision의 약자로 다양한 영상/동영상 처리에 �
 
 사용자가 NUGU에게 경로당에 몇 명이 있는지 질문하면, NUGU는 사용자의 ID를 '경로당 친구들’ 서비스의 프록시 서버로 전달합니다. 프록시 서버는 데이터베이스에 접근하여 해당 사용자 ID에 등록된 경로당이 어디인지와 그 경로당에 설치되어 있는 라즈베리파이(People Counter)가 무엇인지 확인합니다. 이후 프록시 서버는 해당 People Counter에게 해당 공간 내 인원 수를 요청합니다. 이에 따른 응답을 NUGU를 통해 사용자에게 전달합니다.  
   
-![](./image/silverfriend/service_flow.jpeg)
+<img src="./image/silverfriend/service_flow.jpeg" width="100%" />
   
 그럼 이제 여러 시나리오를 통해, '경로당 친구들'서비스가 어떻게 작동하는 지 살펴볼게요.
   
@@ -296,6 +296,7 @@ kurEina 함수가 객체의 방향을 판단해 dir속성을 in 혹은 out으로
 ### C. 경로당 등록 기능 프로토타이핑
 --------------------------
 '경로당 친구들' 서비스를 이용하기 위해, '자주가는 경로당'을 등록하는 사전 작업이 필요합니다. 사용자는 자신의 경로당이 위치한 지역을 설정하고 경로당 이름을 적습니다. 지역(시/도), 지역(시/군/구) 와 경로당 이름을 3가지를 활용하여 전국 경로당 데이터베이스의 검색 작업을 거쳐 결과 리스트를 화면에 출력합니다. 이 중 자신의 경로당을 선택하고 등록하면 서비스 이용이 가능합니다.  
+<img src="./image/silverfriend/prototype.png" width="100%" />
 <br>
 &nbsp;
 <br>    ㅤ
