@@ -178,7 +178,11 @@ openCV관련 오픈 소스 라이브러리입니다. 영상의 처리 속도를 
 <br>    ㅤ
   
 #### 4. 오브젝트 트래킹  
-InvisibleCount는 프레임 카운트 딜레이 수입니다. 인식된 객체는 Person 객체로 생성되고 persons 리스트에 더해집니다. 따라서 persons 리스트에는 현재 프로그램이 트래킹 중인 Person 객체가 모두 들어있는데, 여기서는 해당 Person 객체 리스트에 들어있는 각각의 Person 객체에 대해 InvisibleCount 값을 1씩 증가시키고, 만약 이 값이 if 문을 통해 지정한 값보다 클 경우, 해당 Person 객체는 현재 카메라가 보고 있는 화면 내에 일정 프레임 수 이상 동안 존재하지 않았다는 것을 의미하기 때문에 persons 리스트에서 해당 Person 객체를 제거합니다.  
+우리는 오브젝트 트래킹 과정에서 인식된 각 객체를 import 한 Person 클래스를 이용해 Person 객체를 생성해 persons 리스트에 추가합니다.
+따라서 persons 리스트에는 현재 프로그램이 트래킹 중인 모든 Person 객체가 들어있습니다.
+그리고 Person 객체의 속성 중에는 InvisibleCount 라는 속성이 존재하는데, 이 속성은 매 영상 프레임마다 1씩 증가 됩니다.
+이 InvisibleCount는 해당 Person 객체가 현재 영상의 프레임에서 발견 될 때마다 0으로 다시 업데이트 되는데, 만약 설정한 InvisibleCount의 임계값을 초과하면(즉, 영상의 프레임 수가 임계값의 수만큼 지나갈때 까지, 영상 내에서 해당 Person 객체가 발견되지 않음.)
+해당 Person 객체는 더이상 트래킹 할 필요가 없다고 판단되어 persons 리스트에서 제거됩니다.
 그리고 설정한 areaTH 값보다 큰 area를 가진 컨투어링 된 객체가 있을 때 마다 해당 객체를 persons 리스트에 존재하는 모든 Person 객체들의 중심값과 컨투어링 객체를 bounding 한 사각형의 시작 포인트 (x, y)와 비교했을 때 x와 Person 객체의 중심값 x의 차가 설정한 너비마진 보다 작거나 같고, 또 y와 객체의 중심값 y의 차가 설정한 높이마진 보다 작거나 같은 경우, 해당 컨투어링 객체는 비교한 Person 객체와 동일한 객체라고 볼 수 있기 때문에(따라서 너비마진 값과 높이 마진 값을 어떻게 설정하느냐에 따라 인식률이 달라진다.) 중심값을 해당 컨투어링 박스의 중심값으로 새로 업데이트 해주고 InvisibleCount 값을 0으로 업데이트 해준다. 0으로 업데이트 해주는 이유는, InvisibleCount 값이 일정 값 이상 넘어가면 해당 객체를 더이상 트래킹 하지 않아도 되는 것으로 판단 하기 때문에 현재 프레임에서 발견된 Person 객체는 최근에 발견되었으므로 다시 0으로 업데이트 해주는 것이다. 만약 계속해서 프레임 내에서 발견되지 않아서 0으로 업데이트 되지 않은 Person 객체는 프레임이 지나갈수록 InvisibleCount 값이 쌓여서 얼마 후에 persons 리스트에서 제거 될 것이다.
 
 ~~~python
@@ -313,7 +317,10 @@ kurEina 함수가 객체의 방향을 판단해 dir속성을 in 혹은 out으로
 --------------------------
 #### 1. OpenCV 영상 참고 자료 및 관련 코드
 [![openCV Video](http://img.youtube.com/vi/S26G0a7u9d4/0.jpg)](https://www.youtube.com/watch?v=S26G0a7u9d4)  
-Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-raspberry)](https://github.com/donce71/Pedestrians-counter-raspberry)
+Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-raspberry)](https://github.com/donce71/Pedestrians-counter-raspberry)  
+
+#### 2. 서울특별시 경로당 정보  
+[(https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1)](https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1)
   
 <br>
 &nbsp;
