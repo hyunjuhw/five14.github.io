@@ -292,7 +292,7 @@ kurEina 함수가 객체의 방향을 판단해 dir속성을 in 혹은 out으로
     cv2.putText(frame, str_in, (10,50), font,0.5,(255,0,0), 1,cv2.LINE_AA)
 ~~~
   
-<u>'경로당 친구들' 코드 전체를 보고 싶은 분은 [경로당 친구들 openCV](https://github.com/hyunjuhw/five14.github.io/blob/master/silver_friends_opencv.py)를 참고해주세요. </u> 
+<u>'경로당 친구들'</u> 코드 전체를 보고 싶은 분은 [경로당 친구들 openCV](https://github.com/hyunjuhw/five14.github.io/blob/master/silver_friends_opencv.py)를 참고해주세요.  
 <br>
 &nbsp;
 <br>    ㅤ
