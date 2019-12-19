@@ -324,7 +324,8 @@ Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-ra
 #### 3. 서울특별시 광진구 경로당 정보
 [https://www.data.go.kr/dataset/15041530/fileData.do](https://www.data.go.kr/dataset/15041530/fileData.do)  
 
-
+#### 4. 전국 경로당 개수 현황
+[http://www.index.go.kr/potal/main/EachDtlPageDetail.do?idx_cd=2766](http://www.index.go.kr/potal/main/EachDtlPageDetail.do?idx_cd=2766)  
 <br>
 &nbsp;
 <br>    ㅤ
