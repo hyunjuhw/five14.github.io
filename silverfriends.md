@@ -319,8 +319,12 @@ kurEina 함수가 객체의 방향을 판단해 dir속성을 in 혹은 out으로
 Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-raspberry)](https://github.com/donce71/Pedestrians-counter-raspberry)  
 
 #### 2. 서울특별시 경로당 정보  
-[https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1](https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1)
-  
+[https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1](https://data.seoul.go.kr/dataList/datasetView.do?infId=OA-15052&srvType=S&serviceKind=1&currentPageNo=1)  
+
+#### 3. 서울특별시 광진구 경로당 정보
+[https://www.data.go.kr/dataset/15041530/fileData.do](https://www.data.go.kr/dataset/15041530/fileData.do)  
+
+
 <br>
 &nbsp;
 <br>    ㅤ
