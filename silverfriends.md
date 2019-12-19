@@ -327,3 +327,5 @@ Pedestrians-counter-raspberry[(https://github.com/donce71/Pedestrians-counter-ra
   
 ### 결론
 --------------------------
+#### * 어려웠던 점
+라즈베리파이4B의 컴퓨팅 파워가 생각보다 낮아서 학습된 딥러닝을 구동시킬때 힘이 들었다.
