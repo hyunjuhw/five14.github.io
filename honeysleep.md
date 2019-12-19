@@ -175,14 +175,14 @@ from helper import request
 import json
 ~~~  
 ##### * pytz
-Olson 시간대 데이터베이스를 기준으로 한 세계 시간대 정의를 위한 라이브러리입니다. 'Asia/Seoul' 한국 시간대를 가져오기 위해서 사용였습니다.  
+Olson 시간대 데이터베이스를 기준으로 한 세계 시간대 정의를 위한 라이브러리입니다. 'Asia/Seoul', 한국 시간대를 가져오기 위해 사용하였습니다.  
 ##### * datetime
-시간 처리를 위한 라이브러리입니다. 위의 pytz를 통해 한국 시간대를 가져와 datetime 객체 내부의 timezone 속성을 바꿔주었습니다. 
+시간 처리를 위한 라이브러리입니다. 위의 pytz를 통해 한국 시간대를 가져와 datetime 객체 내부의 timezone 속성을 바꿉니다. 
 <br>
 &nbsp;
 <br>
 #### 2. time_calculate 함수  
-go_to_bed_time 함수에서 내부 호출되는 함수입니다. 기상시간의 'hour'와 'min' 값을 전달받아 사용자에게 알려줄 시간 리스트(time_one, time_two, time_three)를 계산합니다. 서버의 시간의 UST로 설정이 되어있기 때문에, 시간 리스트 처리전에 pytz 라이브러리를 사용하여 한국 시간대로 변경해 줍니다.  
+go_to_bed_time 함수에서 내부 호출되는 함수입니다. 기상시간의 'hour'와 'min' 값을 전달받아 사용자에게 알려줄 시간 리스트(time_one, time_two, time_three)를 계산합니다. 서버 시간의 UST로 설정이 되어있기 때문에, 시간 리스트 처리전에 pytz 라이브러리를 사용하여 한국 시간대로 변경합니다.  
   
 ~~~python
 def time_calculate(hour, min):
@@ -208,7 +208,7 @@ def time_calculate(hour, min):
 <br>  
   
 #### 3. go_to_bed_time 함수  
-사용자의 기상 시간(예를 들어, 오전 7시 30분)을 전달 받아 가장 먼저 시작되는 함수입니다. 받아온 시간을 형식에 맞게 처리해준 뒤, time_caculate 함수를 호출하여 반환값을 통해 변수(kst_now, time_one, time_two, time_three)값을 설정해줍니다. 이 설정된 값들은 아래에 있는 time_one, time_two, time_three 세개의 response 함수들에 전달됩니다.  
+사용자의 기상 시각(예를 들어, 오전 7시 30분)을 전달 받아 가장 먼저 되는 함수입니다. 받아온 시간을 형식에 맞게 처리한 뒤, time_caculate 함수를 호출하여 반환값으로 변수(kst_now, time_one, time_two, time_three)값을 설정합니다. 이어 이 설정값들을 아래에 있는 time_one, time_two, time_three 세가지 response 함수들에 전달니다.  
 ~~~python
 def go_to_bed_time():
 
@@ -268,7 +268,7 @@ def go_to_bed_time():
 <br>  
   
 #### 4. time_one 함수  
-사용자의 '푹 잔 느낌' 서비스 호출 시점이 time_one, time_two, time_three 보다 이전일 때(3개의 반환값이 생길 때), 실행되는 함수입니다. 호출 시점과 가장 가까운 취침시간(best_sleep_time1)과 그 시간까지 남은 시간(remain_time)을 리턴합니다.
+사용자의 '푹 잔 느낌' 서비스 호출 시이 time_one, time_two, time_three 보다 이전일 때(즉, 3개의 반환값이 생길 때) 실행되는 함수입니다. 호출 시점과 가장 가까운 취침시간(best_sleep_time1)과 그 시간까지 남은 시간(remain_time)을 리턴합니다.
 
 ~~~python
 def time_one():
@@ -292,7 +292,7 @@ def time_one():
 <br>  
   
 #### 5. time_two 함수  
-사용자의 '푹 잔 느낌' 서비스 호출 시간이 time_one을 지나고 time_two보다는 이전일 때(2개의 반환값이 생길 때), 실행되는 함수입니다. 호출 시점과 가까운 'best_sleep_time2', 즉 time_two와 그 시간까지 남은 시간을 반환합니다.
+사용자의 '푹 잔 느낌' 서비스 호출 시각이 time_one을 지났으나 time_two보다는 이전일 때(즉, 2개의 반환값이 생길 때) 실행되는 함수입니다. 호출 시각과 가까운 'best_sleep_time2', 즉 time_two와 그 시각까지 남은 시간을 반환합니다.
 ~~~python
 def time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
@@ -315,7 +315,7 @@ def time_two():
 <br>  
   
 #### 6. time_three 함수  
-사용자의 '푹 잔 느낌' 서비스 호출 시간이 time_two을 지나고 time_three보다는 이전일 때(1개의 반환값이 생길 때), 실행되는 함수입니다. 따라서, 'best_sleep_time3', 즉 time_three와 그 시간까지 남은 시간을 반환합니다. 호출 시간이 time_three까지 지난 경우는 수면 시간이 최소 수면 시간을 만족하지 못하기 때문에 취침 시간을 계산해주지 않습니다. 함수의 구성이 간단하기 때문에 따로 적지 않았습니다.
+사용자의 '푹 잔 느낌' 서비스 호출 시각이 time_two을 지났으나 time_three보다는 이전일 때(즉, 1개의 반환값이 생길 때) 실행되는 함수입니다. 따라서, 'best_sleep_time3', 즉 time_three와 그 시각까지 남은 시간을 반환합니다. 호출 시각이 time_three마저 지난 경우에는 수면 시간이 최소 수면 시간을 만족하지 못하기 때문에 취침 시간을 계산하지 않습니다. 함수의 구성이 간단하기 때문에 따로 적지 않았습니다.
 
 ~~~python
 def time_three():
@@ -339,7 +339,7 @@ def time_three():
 <br>  
   
 #### 7. later_time_one 함수  
-사용자가 time_one의 결과값을 받고 나서, 다른 취침시간을 더 알고 싶은 경우(시나리오 2에서 '더 늦게 주무실 예정인가요?' 라는 NUGU의 물음에 긍정적인 대답이 돌아온 상황)에 호출되는 함수입니다. go_to_bed_time 함수에서 계산된 나머지 결과값인 time_two와 time_three를 반환한다고 생각하시면 됩니다. 
+사용자가 time_one의 결과값을 받았지만 다른 취침 시각을 더 제공 받고 싶은 경우(시나리오 2에서 '더 늦게 주무실 예정인가요?' 라는 NUGU의 물음에 긍정적인 대답이 돌아온 상황)에 호출되는 함수입니다. go_to_bed_time 함수에서 계산한 나머지 결과값인 time_two와 time_three를 반환합니다.
 ~~~python
 def later_time_one():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
@@ -362,7 +362,7 @@ def later_time_one():
 <br>  
   
 #### 8. later_time_two 함수  
-사용자가 time_two의 결과값을 받고 나서, 다른 취침시간을 더 알고 싶은 경우에 호출되는 함수입니다. 남은 결과값은 time_three뿐이기 때문에 이 값만 반환한다고 생각하시면 됩니다. 
+사용자가 time_two의 결과값을 받고 나서, 다른 취침 시각을 더 알고 싶은 경우 호출되는 함수입니다. 남은 결과값은 time_three뿐이기 때문에 이 값만 반환합니다.
 ~~~python
 def later_time_two():
     data = request.get_json(silent=True, force=True)['action'].get('parameters')
