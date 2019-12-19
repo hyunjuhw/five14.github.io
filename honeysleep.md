@@ -131,7 +131,7 @@
 -----------------------------------------------
 푹 잔 느낌 UCC를 통해, 푹 잔 느낌을 미리 경험해볼까요?
   
-[![UCC](http://img.youtube.com/vi/I4bQaKrrWc0/0.jpg)](https://www.youtube.com/watch?v=I4bQaKrrWc0)  
+[![UCC](http://img.youtube.com/vi/SRR6vwGgxe4/0.jpg)](https://youtu.be/SRR6vwGgxe4)  
 ㅤ
   ㅤ
   ㅤ
