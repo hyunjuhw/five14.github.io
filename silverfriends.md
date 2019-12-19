@@ -297,9 +297,11 @@ kurEina 함수가 객체의 방향을 판단해 dir속성을 in 혹은 out으로
 &nbsp;
 <br>    ㅤ
   
-### B. 프록시 서버 및 DB 개발
+### B. NUGU 시연 영상
 --------------------------
-코드는 내일 옵니다.
+  
+[![UCC](http://img.youtube.com/vi/ND690B_5RGk/0.jpg)](https://youtu.be/ND690B_5RGk)  
+
 <br>
 &nbsp;
 <br>    ㅤ
