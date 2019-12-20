@@ -98,9 +98,8 @@ Open Source Computer Vision의 약자로 다양한 영상/동영상 처리에 �
 '경로당 친구들'프로젝트는 다음과 같이 4개의 부분으로 나누어져 진행되었습니다.  
  
 > A. 라즈베리파이를 이용한 People Counter 개발  
-> B. 프록시 서버 및 DB 개발  
-> C. 경로당 등록 기능 프로토타이핑  
-> D. NUGU Play개발(Play Builder) 및 연동  
+> B. 경로당 등록 기능 프로토타이핑  
+> C. NUGU Play개발(Play Builder) 및 연동  
   
 <br>
 &nbsp;
@@ -300,7 +299,7 @@ kurEina 함수로 객체의 방향을 판단하여 dir속성을 in 혹은 out으
 ### B. NUGU 시연 영상
 --------------------------
   
-[![UCC](http://img.youtube.com/vi/ND690B_5RGk/0.jpg)](https://youtu.be/ND690B_5RGk)  
+[![UCC](http://img.youtube.com/vi/nMHmD44R4ZM/0.jpg)](https://youtu.be/nMHmD44R4ZM)  
 
 <br>
 &nbsp;
